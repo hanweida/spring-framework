@@ -1,6 +1,6 @@
 version=5.2.2.RELEASE
 ## 设置此参数主要是编译下载包会占用大量的内存，可能会内存溢出
-org.gradle.jvmargs=-Xmx500M -Dfile.encoding=UTF-8
+org.gradle.jvmargs=-Xmx2048M -Dfile.encoding=UTF-8
 
 ## 开启 Gradle 缓存
 org.gradle.caching=true

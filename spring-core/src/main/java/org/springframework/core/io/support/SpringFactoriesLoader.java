@@ -123,16 +123,19 @@ public final class SpringFactoriesLoader {
 	}
 
 	private static Map<String, List<String>> loadSpringFactories(@Nullable ClassLoader classLoader) {
+		//从 缓冲中获取 classLoader 对应的 SpringFactories 集合
 		MultiValueMap<String, String> result = cache.get(classLoader);
 		if (result != null) {
 			return result;
 		}
 
 		try {
+			//通过 classLoader 加载 META-INF/spring.factories 下资源
 			Enumeration<URL> urls = (classLoader != null ?
 					classLoader.getResources(FACTORIES_RESOURCE_LOCATION) :
 					ClassLoader.getSystemResources(FACTORIES_RESOURCE_LOCATION));
 			result = new LinkedMultiValueMap<>();
+			//读取META-INF/spring.factories的属性配置文件
 			while (urls.hasMoreElements()) {
 				URL url = urls.nextElement();
 				UrlResource resource = new UrlResource(url);
@@ -144,6 +147,7 @@ public final class SpringFactoriesLoader {
 					}
 				}
 			}
+			//缓存起来 key:classLoader value:根据 , 分割
 			cache.put(classLoader, result);
 			return result;
 		}
