@@ -172,17 +172,33 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @param allowEarlyReference whether early references should be created or not
 	 * @return the registered singleton object, or {@code null} if none found
 	 */
+	/**
+	 * 解决循环依赖问题
+	 * 类似三级缓存，先从当前的 单例集合中找，
+	 * @param beanName
+	 * @param allowEarlyReference
+	 * @return
+	 */
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+		//双检 并且 解析循环引用；
+		//单例集合有的话，直接返回
 		Object singletonObject = this.singletonObjects.get(beanName);
+		//单例集合没有，并且正在创建中
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
 			synchronized (this.singletonObjects) {
+				//早期单例集合
 				singletonObject = this.earlySingletonObjects.get(beanName);
+				//早期单例集合也没有，并且允许早期引用
 				if (singletonObject == null && allowEarlyReference) {
+					// 获取单例工厂
 					ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 					if (singletonFactory != null) {
+						//创建单例对象
 						singletonObject = singletonFactory.getObject();
+						//放入早期单例集合
 						this.earlySingletonObjects.put(beanName, singletonObject);
+						//单例工厂移除
 						this.singletonFactories.remove(beanName);
 					}
 				}
