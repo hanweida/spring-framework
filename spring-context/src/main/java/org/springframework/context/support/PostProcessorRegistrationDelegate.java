@@ -90,18 +90,25 @@ final class PostProcessorRegistrationDelegate {
 			for (String ppName : postProcessorNames) {
 				//PriorityOrdered 实现PriorityOrdered 顺序
 				if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
+					//获取bean实例，添加到 currentRegistryProcessors 中
 					currentRegistryProcessors.add(beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class));
+					//处理过的 Bean集合添加
 					processedBeans.add(ppName);
 				}
 			}
+			// 排序
 			sortPostProcessors(currentRegistryProcessors, beanFactory);
+			//将 currentRegistryProcessors 添加到 registryProcessors 中
 			registryProcessors.addAll(currentRegistryProcessors);
+			// 调用 Bean标签注册后置处理 currentRegistryProcessors
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
+			// currentRegistryProcessors 清空
 			currentRegistryProcessors.clear();
 
 			// Next, invoke the BeanDefinitionRegistryPostProcessors that implement Ordered.
 			postProcessorNames = beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			for (String ppName : postProcessorNames) {
+				//没有被处理的 postprocessor
 				if (!processedBeans.contains(ppName) && beanFactory.isTypeMatch(ppName, Ordered.class)) {
 					currentRegistryProcessors.add(beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class));
 					processedBeans.add(ppName);
@@ -113,6 +120,8 @@ final class PostProcessorRegistrationDelegate {
 			currentRegistryProcessors.clear();
 
 			// Finally, invoke all other BeanDefinitionRegistryPostProcessors until no further ones appear.
+			//最终调用其他 BeanDefinitionRegistryPostProcessors 直到没有更多的出现
+			//不断重复操作直到没有 postProcessorNames
 			boolean reiterate = true;
 			while (reiterate) {
 				reiterate = false;
@@ -131,6 +140,7 @@ final class PostProcessorRegistrationDelegate {
 			}
 
 			// Now, invoke the postProcessBeanFactory callback of all processors handled so far.
+			// 调用 BeanFactoryPostProcessors
 			invokeBeanFactoryPostProcessors(registryProcessors, beanFactory);
 			invokeBeanFactoryPostProcessors(regularPostProcessors, beanFactory);
 		}

@@ -529,9 +529,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				postProcessBeanFactory(beanFactory);
 
 				// Invoke factory processors registered as beans in the context.
+				// 调用 BeanFactoryPostProcessors，在单例实例化之前调用
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
+				// 注册BeanPostProcessors 并且会注册 bean 实例；【由于调用了 getBean方法】
+				// 当后面要实例化bean之前，BeanPostProcessor 用来干预Bean的创建，所以在Bean实例化之前，就要实例化所有的 BeanPostProcessor(包括开发人员自己定义的)
+				// 最后再重新注册了ApplicationListenerDetector，这样做的目的是为了将ApplicationListenerDetector放入到后置处理器的最末端
+
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
